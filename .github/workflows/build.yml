@@ -95,6 +95,7 @@ jobs:
             compiler: clang
             version: 23
             conduits: *ubuntu_conduits
+            ldflags: -L/usr/lib/gcc/x86_64-linux-gnu/15
             container: phhargrove/llvm-flang:23.1.0_rc2-latest
           - os: ubuntu-24.04
             compiler: clang
@@ -152,7 +153,8 @@ jobs:
       COMPILER_VERSION: ${{ matrix.version }}
       CC: ${{ matrix.compiler }}
       CFLAGS: ${{ matrix.extra_flags }}
-      CONFIGURE_ARGS: --disable-mpi-compat --enable-rpath --enable-debug ${{ inputs.configure_args }}
+      LDFLAGS: ${{ matrix.ldflags }}
+      CONFIGURE_ARGS: --disable-mpi-compat --enable-rpath --enable-debug --enable-smp --enable-udp ${{ inputs.configure_args }}
       GASNET_BACKTRACE: 1
       GASNET_SPAWN_VERBOSE: 1
       GASNET_VERBOSEENV: 1
