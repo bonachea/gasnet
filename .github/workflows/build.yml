@@ -61,7 +61,6 @@ jobs:
         os: [ macos-14, macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04, ubuntu-26.04-arm ]
         compiler: [ gcc ]
         version: [ 12, 13, 14, 15, 16 ]
-        extra_flags: [ -g ]
 
         include:
           - os: ubuntu-24.04
@@ -91,11 +90,13 @@ jobs:
             version: 22
 
           # https://hub.docker.com/r/phhargrove/llvm-flang/tags
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             compiler: clang
             version: 23
+            # libopenmpi-dev pulls in gcc-16 without g++, so ensure we use gcc-15
+            cflags: --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/15
+            cxxflags: --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/15
             conduits: *ubuntu_conduits
-            ldflags: -L/usr/lib/gcc/x86_64-linux-gnu/15
             container: phhargrove/llvm-flang:23.1.0_rc2-latest
           - os: ubuntu-24.04
             compiler: clang
@@ -152,7 +153,8 @@ jobs:
     env:
       COMPILER_VERSION: ${{ matrix.version }}
       CC: ${{ matrix.compiler }}
-      CFLAGS: ${{ matrix.extra_flags }}
+      CFLAGS: ${{ matrix.cflags }}
+      CXXFLAGS: ${{ matrix.cxxflags }}
       LDFLAGS: ${{ matrix.ldflags }}
       CONFIGURE_ARGS: --disable-mpi-compat --enable-rpath --enable-debug --enable-smp --enable-udp ${{ inputs.configure_args }}
       GASNET_BACKTRACE: 1
